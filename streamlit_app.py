@@ -135,6 +135,9 @@ elif (strategy_selectbox_side==strategies[1]):
     fig.add_hline(y=80,line_dash='dash',line_color="red")
     fig.add_hline(y=20,line_dash='dash',line_color="green")
     fig.add_hline(y=0)
+    fig.update_xaxes(title=" ")
+    fig.update_yaxes(title=" ")
+    #fig.update_layout(showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
 
