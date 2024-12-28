@@ -19,9 +19,9 @@ import warnings
 #--------------------------------------------------------------------
 from api.momentum_strategy_1_api import *
 from api.data_snapshot_date_api import *
-#from stochastic_oscillator_1_api import *
-#from valid_date_return import *
-#from stochastic_charts_api import *
+from api.stochastic_oscillator_1_api import *
+from api.valid_date_return_api import *
+from api.stochastic_charts_api import *
 #from volatility_skew_strategy_api import *
 #from volatility_charts_api import *
 #from trend_following_strategy_api import *
@@ -55,6 +55,7 @@ scrip_name=['ASIANPAINT','EICHERMOT','HEROMOTOCO','TATAMOTORS','APOLLOHOSP','SBI
 st.sidebar.image("logo.jpg")
 st.sidebar.write('--------------')
 st.sidebar.subheader('Navigation Bar')
+#st.sidebar.page_link("open_hft_frontend.py", label="Quant Strategies", icon="🏠")
 st.sidebar.page_link("streamlit_app.py", label="Quant Strategies", icon="🏠")
 st.sidebar.page_link("pages/intraday_forecasts.py", label="Intraday ML Forecasts", icon="⛅")
 st.sidebar.page_link("pages/backtests.py", label="Backtesting Module", icon="📠")
@@ -65,6 +66,11 @@ strategy_selectbox_side = st.sidebar.selectbox('Select your Quant Strategy', (st
 #--------------------------------------------------------------------
 #SECTION 1 - MAIN PANEL CODE & FUNCTIONAL CALLS
 #--------------------------------------------------------------------
+
+#--------------------------------------------------------------------
+#QUANT STRATEGY 1 - MOMENTUM STRATEGY
+#--------------------------------------------------------------------
+
 
 if (strategy_selectbox_side==strategies[0]):
   'Below are the stock recommendations for ', strategy_selectbox_side
@@ -91,6 +97,46 @@ if (strategy_selectbox_side==strategies[0]):
   """)
   '-----------------------------------------'
   
+
+#--------------------------------------------------------------------
+#QUANT STRATEGY 2 - STOCHASTIC STRATEGY
+#--------------------------------------------------------------------
+
+elif (strategy_selectbox_side==strategies[1]):
+
+
+  col1, col2 = st.columns(2)
+  with col1:
+    'Below are the stock recommendations for ', strategy_selectbox_side
+    df1=stochastic_strategy_1(data_snapshot_date())
+    st.dataframe(df1,hide_index=True,
+      column_config=dict(
+      K=st.column_config.NumberColumn('Fast Signal (K)'),
+      D=st.column_config.NumberColumn('Slow Signal (D)'),
+      overbought=st.column_config.NumberColumn('Overbought'),
+      oversold=st.column_config.NumberColumn('Oversold'),
+      signal_sanitized=st.column_config.NumberColumn('Buy Signal')
+      )
+    )
+  
+  with col2:
+    scrip_selectbox_main = st.selectbox('Select your Stock', (scrip_name))
+    start_date=  st.date_input('Select Start Date for Chart', value=valid_date_return()[0])
+    end_date=str(data_snapshot_date())
+    df2=stochastic_strategy_1_chart(scrip_selectbox_main,str(start_date),end_date)
+    #st.dataframe(df2)
+    fig = px.line(
+      df2,
+      x="Datetime",
+      y=["K","D"]
+    )
+  
+    fig.add_hline(y=100)
+    fig.add_hline(y=80,line_dash='dash',line_color="red")
+    fig.add_hline(y=20,line_dash='dash',line_color="green")
+    fig.add_hline(y=0)
+    st.plotly_chart(fig, use_container_width=True)
+
 
 
 
