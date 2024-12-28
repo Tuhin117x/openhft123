@@ -26,7 +26,7 @@ from api.volatility_skew_strategy_api import *
 from api.volatility_charts_api import *
 from api.trend_following_strategy_api import *
 from api.trend_following_charts_api import *
-#from pairs_trading_strategy_api import *
+from api.pairs_trading_strategy_api import *
 
 
 #--------------------------------------------------------------------
@@ -250,6 +250,87 @@ elif (strategy_selectbox_side==strategies[3]):
     #Use st.metrics to display the final recommendations in a fancy manner at a later stage of the MVP
     #-------------------------------------------------------------------------------------------------
 
+
+#--------------------------------------------------------------------
+#QUANT STRATEGY 4 - PAIRS TRADING STRATEGY
+#--------------------------------------------------------------------
+
+elif (strategy_selectbox_side==strategies[4]):
+  display = pairs_trading(str(data_snapshot_date()))
+  options = list(range(len(display)))
+  value = st.selectbox("Select your Stock Pair", options, format_func=lambda x: display[x])
+  asset1,asset2=display[value]
+  df=pairs_trading_spread(value)
+  fig = px.line(
+  df,
+  x="Datetime",
+  y=["return"]  
+  )
+
+  fig.update_layout(
+  title={
+        'text': "Spread Between "+str(asset1)+" & "+str(asset2),
+        'y':0.9,
+        'x':0.5,
+        'xanchor': 'center',
+        'yanchor': 'top'})
+  fig.update_xaxes(title=" ")
+  fig.update_yaxes(title=" ")
+  fig.update_layout(showlegend=False)
+  lb=-df.loc[:, 'return'].std()
+  ub=df.loc[:, 'return'].std()
+  avg=df.loc[:, 'return'].mean()
+  fig.add_hline(y=lb,line_dash='dash',line_color="red")
+  fig.add_hline(y=2*lb,line_dash='dot',line_color="green")
+  fig.add_hline(y=ub,line_dash='dash',line_color="red")
+  fig.add_hline(y=2*ub,line_dash='dot',line_color="green")
+  fig.add_hline(y=avg,line_dash='dot',line_color="yellow")
+  #fig.update_xaxes(showline=True, linewidth=2, linecolor='black')
+  #fig.update_yaxes(showline=True, linewidth=2, linecolor='black')
+  #fixed_vol=volatility_average(scrip_selectbox_main)
+  #st.write(fixed_vol)
+  #fig.add_hline(y=fixed_vol,line_dash='dash',line_color="green")
+  st.plotly_chart(fig, use_container_width=True)
+
+
+  col1, col2 = st.columns(2)
+  with col1:
+    fig1 = px.line(
+    df,
+    x="Datetime",
+    y=["asset1"]  
+    )
+    fig1.update_layout(
+    title={
+        'text': "Stock Price Chart for "+str(asset1),
+        'y':0.9,
+        'x':0.5,
+        'xanchor': 'center',
+        'yanchor': 'top'})   
+    fig1.update_xaxes(title=" ")
+    fig1.update_yaxes(title=" ")
+    fig1.update_layout(showlegend=False)
+  
+    st.plotly_chart(fig1, use_container_width=True)
+
+  with col2:
+    fig2 = px.line(
+    df,
+    x="Datetime",
+    y=["asset2"]  
+    )   
+    fig2.update_layout(
+    title={
+        'text': "Stock Price Chart for "+str(asset2),
+        'y':0.9,
+        'x':0.5,
+        'xanchor': 'center',
+        'yanchor': 'top'}) 
+
+    fig2.update_xaxes(title=" ")
+    fig2.update_yaxes(title=" ")
+    fig2.update_layout(showlegend=False)
+    st.plotly_chart(fig2, use_container_width=True)
 
 
 
