@@ -24,8 +24,8 @@ from api.valid_date_return_api import *
 from api.stochastic_charts_api import *
 from api.volatility_skew_strategy_api import *
 from api.volatility_charts_api import *
-#from trend_following_strategy_api import *
-#from trend_following_charts_api import *
+from api.trend_following_strategy_api import *
+from api.trend_following_charts_api import *
 #from pairs_trading_strategy_api import *
 
 
@@ -131,6 +131,13 @@ elif (strategy_selectbox_side==strategies[1]):
       y=["K","D"]
     )
   
+    fig.update_layout(
+    title={
+        'text': "Stochastic Indicator Chart",
+        'y':0.9,
+        'x':0.5,
+        'xanchor': 'center',
+        'yanchor': 'top'})
     fig.add_hline(y=100)
     fig.add_hline(y=80,line_dash='dash',line_color="red")
     fig.add_hline(y=20,line_dash='dash',line_color="green")
@@ -171,13 +178,80 @@ elif (strategy_selectbox_side==strategies[2]):
       x="Datetime",
       y=["V15D_SD"]
     )
-
+    fig.update_layout(
+    title={
+        'text': "Volatility Chart",
+        'y':0.9,
+        'x':0.5,
+        'xanchor': 'center',
+        'yanchor': 'top'})
     fig.update_xaxes(title=" ")
     fig.update_yaxes(title=" ")
     fig.update_layout(showlegend=False)
     fixed_vol=volatility_average(scrip_selectbox_main)
     fig.add_hline(y=fixed_vol,line_dash='dash',line_color="green")
     st.plotly_chart(fig, use_container_width=True)
+
+#--------------------------------------------------------------------
+#QUANT STRATEGY 3 - TREND FOLLOWING STRATEGY
+#--------------------------------------------------------------------
+
+
+elif (strategy_selectbox_side==strategies[3]):
+  col1, col2 = st.columns(2)
+  with col1:
+    print("Entered Trend Following Strategy")
+    #st.write("Data Refresh Date: "+str(data_snapshot_date()))
+    'Below are the stock recommendations for ', strategy_selectbox_side
+    df1=trend_following_strategy(data_snapshot_date())
+    #st.dataframe(df1)
+    st.dataframe(df1,hide_index=True
+        ,
+        column_config=dict(
+        R03D_DR=st.column_config.NumberColumn('A03DD Return',format='%.3f %%'),
+        R15D_DR=st.column_config.NumberColumn('A15DD Return',format='%.3f %%'),
+        R30D_DR=st.column_config.NumberColumn('A30DD Return',format='%.3f %%'),
+        R45D_DR=st.column_config.NumberColumn('A45DD Return',format='%.3f %%'),
+        weighted_daily_return=st.column_config.NumberColumn('Weighted Average Return',format='%.2f %%')
+        )
+      )
+    
+
+  with col2:
+    scrip_selectbox_main = st.selectbox('Select your Stock', (scrip_name))
+    start_date=  st.date_input('Select Start Date for Chart', value=valid_date_return()[0])
+    end_date=str(data_snapshot_date())
+    df2=daily_return_chart(scrip_selectbox_main,str(start_date),end_date)
+    #st.dataframe(df2)
+
+    fig = px.line(
+      df2,
+      x="Datetime",
+      y=["daily_return"]  
+    )
+
+    fig.update_layout(
+    title={
+        'text': "Daily Return Profile (in %)",
+        'y':0.9,
+        'x':0.5,
+        'xanchor': 'center',
+        'yanchor': 'top'})
+    fig.update_xaxes(title=" ")
+    fig.update_yaxes(title=" ")
+    fig.update_layout(showlegend=False)
+    #fig.update_xaxes(showline=True, linewidth=2, linecolor='black')
+    #fig.update_yaxes(showline=True, linewidth=2, linecolor='black')
+    #fixed_vol=volatility_average(scrip_selectbox_main)
+    #st.write(fixed_vol)
+    #fig.add_hline(y=fixed_vol,line_dash='dash',line_color="green")
+    st.plotly_chart(fig, use_container_width=True)   
+    #-------------------------------------------------------------------------------------------------
+    #Use st.metrics to display the final recommendations in a fancy manner at a later stage of the MVP
+    #-------------------------------------------------------------------------------------------------
+
+
+
 
 
 else:
