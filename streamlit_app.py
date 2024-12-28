@@ -22,8 +22,8 @@ from api.data_snapshot_date_api import *
 from api.stochastic_oscillator_1_api import *
 from api.valid_date_return_api import *
 from api.stochastic_charts_api import *
-#from volatility_skew_strategy_api import *
-#from volatility_charts_api import *
+from api.volatility_skew_strategy_api import *
+from api.volatility_charts_api import *
 #from trend_following_strategy_api import *
 #from trend_following_charts_api import *
 #from pairs_trading_strategy_api import *
@@ -140,8 +140,44 @@ elif (strategy_selectbox_side==strategies[1]):
     #fig.update_layout(showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
+#--------------------------------------------------------------------
+#QUANT STRATEGY 2 - VOLATILITY SKEW STRATEGY
+#--------------------------------------------------------------------
 
 
+elif (strategy_selectbox_side==strategies[2]):
+  col1, col2 = st.columns(2)
+  with col1:
+    'Below are the stock recommendations for ', strategy_selectbox_side
+    df1=volatility_skew_strategy(data_snapshot_date())
+    st.dataframe(df1,hide_index=True
+        ,
+        column_config=dict(
+        V15D_SD=st.column_config.NumberColumn('15D Vol'),
+        V30D_SD=st.column_config.NumberColumn('30D Vol'),
+        V45D_SD=st.column_config.NumberColumn('45D Vol'),
+        weighted_vol=st.column_config.NumberColumn('Weighted Vol')
+        )
+      )
+  with col2:
+    scrip_selectbox_main = st.selectbox('Select your Stock', (scrip_name))
+    start_date=  st.date_input('Select Start Date for Chart', value=valid_date_return()[0])
+    end_date=str(data_snapshot_date())
+    df2=volatility_chart(scrip_selectbox_main,str(start_date),end_date)
+    #st.dataframe(df2)
+
+    fig = px.line(
+      df2,
+      x="Datetime",
+      y=["V15D_SD"]
+    )
+
+    fig.update_xaxes(title=" ")
+    fig.update_yaxes(title=" ")
+    fig.update_layout(showlegend=False)
+    fixed_vol=volatility_average(scrip_selectbox_main)
+    fig.add_hline(y=fixed_vol,line_dash='dash',line_color="green")
+    st.plotly_chart(fig, use_container_width=True)
 
 
 else:
