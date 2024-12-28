@@ -4,3 +4,5 @@ arrow
 scipy
 matplotlib
 statsmodels
+xgboost
+scikit-learn

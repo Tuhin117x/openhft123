@@ -1,45 +1,24 @@
-"""
-# My first app
-Here's our first attempt at using data to create a table:
-"""
-
+#--------------------------------------------------------------------
+#IMPORT ALL EXTERNAL REQUIRED LIBRARIES & DEPENDENCIES
+#--------------------------------------------------------------------
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-#from datetime import date
-#import datetime
-from momentum_strategy_1_api import *
-from stochastic_oscillator_1_api import *
-from valid_date_return import *
-from stochastic_charts_api import *
-from data_snapshot_date_api import *
-from volatility_skew_strategy_api import *
-from volatility_charts_api import *
-from trend_following_strategy_api import *
-from trend_following_charts_api import *
-from pairs_trading_strategy_api import *
 import plotly.express as px
-from ml_forecast_predict import *
-from ml_forecast_charts_roc import *
-from ml_forecast_metrics import *
-import matplotlib.pyplot as plt1
 
-st.set_page_config(layout="wide", initial_sidebar_state="expanded")
-warnings.filterwarnings('ignore')
+#--------------------------------------------------------------------
+#IMPORT ALL INTERNAL REQUIRED LIBRARIES & DEPENDENCIES
+#--------------------------------------------------------------------
+from api.valid_date_return_api import *
+from api.data_snapshot_date_api import *
+from ml_model.ml_forecast_predict import *
+from ml_model.ml_forecast_metrics import *
+from ml_model.ml_forecast_charts_roc import *
 
-st.sidebar.image("logo.jpg")
-#st.sidebar.write('Last Refreshed On ' + str(data_snapshot_date()))
-#st.sidebar.markdown(":red[Last Refreshed On]")
-#st.sidebar.write(' ')
-#st.sidebar.write(' ')
-st.sidebar.write('--------------')
-st.sidebar.subheader('Navigation Bar')
-st.sidebar.page_link("open_hft_frontend.py", label="Quant Strategies", icon="🏠")
-st.sidebar.page_link("pages/intraday_forecasts.py", label="Intraday ML Forecasts", icon="⛅")
-st.sidebar.page_link("pages/backtests.py", label="Backtesting Module", icon="📠")
-st.sidebar.write('🍵 Data Last Refreshed On ' + str(data_snapshot_date()))
 
-#strategies=['Momentum Strategy','Stochastic Oscillator Strategy','Volatility Skew Strategy','Trend Following Strategy','Pairs Trading Strategy']
+#--------------------------------------------------------------------
+#SECTION 0 - INTERNAL VARIABLE DECLARATION
+#--------------------------------------------------------------------
 
 scrip_name=['ASIANPAINT','EICHERMOT','HEROMOTOCO','TATAMOTORS','APOLLOHOSP','SBIN','M&M',
           'BEL','JSWSTEEL','ICICIBANK','INDUSINDBK','ONGC','BAJAJ-AUTO','BRITANNIA','NESTLEIND',
@@ -47,9 +26,27 @@ scrip_name=['ASIANPAINT','EICHERMOT','HEROMOTOCO','TATAMOTORS','APOLLOHOSP','SBI
           'AXISBANK','NTPC','TECHM','SBILIFE','CIPLA','GRASIM','HINDUNILVR','LT','TATACONSUM','WIPRO',
           'TITAN','BPCL','INFY','SUNPHARMA','TCS','MARUTI','HCLTECH','COALINDIA','ULTRACEMCO']
 
-st.sidebar.write('--------------')
-#st.write("Data Refresh Date: "+str(data_snapshot_date()))
 
+#--------------------------------------------------------------------
+#BACKTEST PAGE CODE STARTS HERE
+#--------------------------------------------------------------------
+#SECTION 1 - SIDE PANEL CODE
+#--------------------------------------------------------------------
+
+st.sidebar.image("logo.jpg")
+st.sidebar.write('--------------')
+st.sidebar.subheader('Navigation Bar')
+#st.sidebar.page_link("open_hft_frontend.py", label="Quant Strategies", icon="🏠")
+st.sidebar.page_link("streamlit_app.py", label="Quant Strategies", icon="🏠")
+st.sidebar.page_link("pages/intraday_forecasts.py", label="Intraday ML Forecasts", icon="⛅")
+st.sidebar.page_link("pages/backtests.py", label="Backtesting Module", icon="📠")
+st.sidebar.write('🍵 Data Last Refreshed On ' + str(data_snapshot_date()))
+st.sidebar.write('--------------')
+
+
+#--------------------------------------------------------------------
+#SECTION 1 - MAIN PANEL CODE & FUNCTIONAL CALLS
+#--------------------------------------------------------------------
 
 st.header('Using XGBoost ML model for Stock Prediction',divider='grey')
 
@@ -71,7 +68,7 @@ with col2:
 
 
 with col1:
-	with open('model.pkl', 'rb') as f:
+	with open('ml_model/model.pkl', 'rb') as f:
 		model = pickle.load(f)
 	
 	st.pyplot(plot_importance(model).figure)
@@ -105,5 +102,3 @@ with col2:
 	fig.update_layout(showlegend=False)
   	
 	st.plotly_chart(fig, use_container_width=True)
-
-
